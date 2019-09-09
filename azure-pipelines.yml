@@ -1,0 +1,34 @@
+name: 0.1.$(Rev:r)
+
+trigger:
+  batch: true
+  branches:
+    include:
+      - master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  - name: terraform_download_sha
+    value: 43806e68f7af396449dd4577c6e5cb63c6dc4a253ae233e1dddc46cf423d808b
+  - name: terraform_version
+    value: 0.12.8
+  - name: tf_in_automation
+    value: true
+
+steps:
+  - task: Bash@3
+    inputs:
+      filePath: './scripts/terraform-download.sh'
+      failOnStderr: true
+    displayName: 'Terraform Download'
+
+  - task: AzureCLI@1
+    inputs:
+      azureSubscription: 'Azure MSDN'
+      scriptLocation: 'scriptPath'
+      scriptPath: './script/terraform-init.sh'
+      addSpnToEnvironment: true
+      failOnStandardError: true
+    displayName: 'Terraform Init'
