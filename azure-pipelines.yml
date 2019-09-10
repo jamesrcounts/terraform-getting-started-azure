@@ -32,3 +32,34 @@ steps:
       addSpnToEnvironment: true
       failOnStandardError: true
     displayName: 'Terraform Init'
+
+  - task: AzureCLI@1
+    inputs:
+      azureSubscription: 'Azure MSDN'
+      scriptLocation: 'scriptPath'
+      scriptPath: './script/terraform-plan.sh'
+      addSpnToEnvironment: true
+      failOnStandardError: true
+    env:
+      ARM_CLIENT_ID: $(azure_client_id)
+      ARM_CLIENT_SECRET: $(azure_client_secret)
+      ARM_SUBSCRIPTION_ID: $(azure_subscription_id)
+      ARM_TENANT_ID: $(azure_tenant_id)
+    displayName: 'Terraform Plan'
+
+  - task: ArchiveFiles@2
+    inputs:
+      rootFolderOrFile: '.'
+      includeRootFolder: false
+      archiveType: 'tar'
+      tarCompression: 'gz'
+      archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).tgz'
+      replaceExistingArchive: true
+    displayName: 'Create Plan Artifact'
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      ArtifactName: 'drop'
+      publishLocation: 'Container'
+    displayName: 'Publish Plan Artifact'
