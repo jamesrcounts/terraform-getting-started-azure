@@ -38,14 +38,9 @@ steps:
       azureSubscription: 'Azure MSDN'
       scriptLocation: 'scriptPath'
       scriptPath: './scripts/terraform-plan.sh'
+      arguments: '$(Build.SourcesDirectory)'
       addSpnToEnvironment: true
       failOnStandardError: true
-      workingDirectory: '$(Build.SourcesDirectory)'
-    env:
-      ARM_CLIENT_ID: '$(azure_client_id)'
-      ARM_CLIENT_SECRET: '$(azure_client_secret)'
-      ARM_SUBSCRIPTION_ID: '$(azure_subscription_id)'
-      ARM_TENANT_ID: '$(azure_tenant_id)'
     displayName: 'Terraform Plan'
 
   - task: ArchiveFiles@2
