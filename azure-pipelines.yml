@@ -18,6 +18,9 @@ variables:
     value: true
 
 steps:
+  - checkout: self
+    fetchDepth: 1
+
   - task: Bash@3
     inputs:
       filePath: './scripts/terraform-download.sh'
