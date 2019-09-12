@@ -32,24 +32,28 @@ steps:
       failOnStandardError: true
     displayName: 'Environment Setup'
 
-  - task: AzureCLI@1
+  - task: Bash@3
     inputs:
-      azureSubscription: 'Azure MSDN'
-      scriptLocation: 'scriptPath'
-      scriptPath: './scripts/terraform-init.sh'
+      filePath: './scripts/terraform-init.sh'
       arguments: '$(Build.SourcesDirectory)'
-      addSpnToEnvironment: true
-      failOnStandardError: true
+      failOnStderr: true
+    env:
+      ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
+      ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
+      ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
+      ARM_TENANT_ID: $(AZURE_TENANT_ID)
     displayName: 'Terraform Init'
 
-  - task: AzureCLI@1
+  - task: Bash@3
     inputs:
-      azureSubscription: 'Azure MSDN'
-      scriptLocation: 'scriptPath'
-      scriptPath: './scripts/terraform-plan.sh'
+      filePath: './scripts/terraform-plan.sh'
       arguments: '$(Build.SourcesDirectory)'
-      addSpnToEnvironment: true
-      failOnStandardError: true
+      failOnStderr: true
+    env:
+      ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
+      ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
+      ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
+      ARM_TENANT_ID: $(AZURE_TENANT_ID)
     displayName: 'Terraform Plan'
 
   - task: ArchiveFiles@2
