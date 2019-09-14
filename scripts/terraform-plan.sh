@@ -4,7 +4,4 @@ set -euo pipefail
 WORKING_DIRECTORY=${1}
 cd ${WORKING_DIRECTORY}
 
-terraform plan \
-  -input=false \
-  -no-color \
-  -out ${BUILD_BUILDNUMBER}.tfplan
+terraform plan -input=false -out ${BUILD_BUILDNUMBER}.tfplan

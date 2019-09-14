@@ -4,6 +4,4 @@ set -euo pipefail
 WORKING_DIRECTORY=${1}
 cd ${WORKING_DIRECTORY}
 
-terraform init \
-  -input=false \
-  -no-color
+terraform init -input=false 
