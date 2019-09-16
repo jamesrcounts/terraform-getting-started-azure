@@ -6,9 +6,6 @@ trigger:
     include:
       - master
 
-pool:
-  vmImage: 'ubuntu-latest'
-
 variables:
   - name: terraform_download_sha
     value: 43806e68f7af396449dd4577c6e5cb63c6dc4a253ae233e1dddc46cf423d808b
@@ -17,61 +14,117 @@ variables:
   - name: tf_in_automation
     value: true
 
-steps:
-  - checkout: self
-    fetchDepth: 1
+stages:
+  - stage: Build
+    jobs:
+      - job: Build
 
-  - task: Bash@3
-    inputs:
-      filePath: './scripts/terraform-download.sh'
-    displayName: 'Terraform Download'
+        pool:
+          vmImage: 'ubuntu-latest'
 
-  - task: AzureCLI@1
-    inputs:
-      azureSubscription: 'Azure MSDN'
-      scriptLocation: 'scriptPath'
-      scriptPath: './scripts/environment-setup.sh'
-      addSpnToEnvironment: true
-      failOnStandardError: true
-    displayName: 'Environment Setup'
+        steps:
+          - checkout: self
+            fetchDepth: 1
 
-  - task: Bash@3
-    inputs:
-      filePath: './scripts/terraform-init.sh'
-      arguments: '$(Build.SourcesDirectory)'
-      failOnStderr: true
-    env:
-      ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
-      ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
-      ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
-      ARM_TENANT_ID: $(AZURE_TENANT_ID)
-    displayName: 'Terraform Init'
+          - task: Bash@3
+            inputs:
+              filePath: './scripts/terraform-download.sh'
+            displayName: 'Terraform Download'
 
-  - task: Bash@3
-    inputs:
-      filePath: './scripts/terraform-plan.sh'
-      arguments: '$(Build.SourcesDirectory)'
-      failOnStderr: true
-    env:
-      ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
-      ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
-      ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
-      ARM_TENANT_ID: $(AZURE_TENANT_ID)
-    displayName: 'Terraform Plan'
+          - task: AzureCLI@1
+            inputs:
+              azureSubscription: 'Azure MSDN'
+              scriptLocation: 'scriptPath'
+              scriptPath: './scripts/environment-setup.sh'
+              addSpnToEnvironment: true
+              failOnStandardError: true
+            displayName: 'Environment Setup'
 
-  - task: ArchiveFiles@2
-    inputs:
-      rootFolderOrFile: '$(Build.SourcesDirectory)'
-      includeRootFolder: false
-      archiveType: 'tar'
-      tarCompression: 'gz'
-      archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).tgz'
-      replaceExistingArchive: true
-    displayName: 'Create Plan Artifact'
+          - task: Bash@3
+            inputs:
+              filePath: './scripts/terraform-init.sh'
+              arguments: '$(Build.SourcesDirectory)'
+              failOnStderr: true
+            env:
+              ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
+              ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
+              ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
+              ARM_TENANT_ID: $(AZURE_TENANT_ID)
+            displayName: 'Terraform Init'
 
-  - task: PublishBuildArtifacts@1
-    inputs:
-      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-      ArtifactName: 'drop'
-      publishLocation: 'Container'
-    displayName: 'Publish Plan Artifact'
+          - task: Bash@3
+            inputs:
+              filePath: './scripts/terraform-plan.sh'
+              arguments: '$(Build.SourcesDirectory)'
+              failOnStderr: true
+            env:
+              ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
+              ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
+              ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
+              ARM_TENANT_ID: $(AZURE_TENANT_ID)
+            displayName: 'Terraform Plan'
+
+          - task: ArchiveFiles@2
+            inputs:
+              rootFolderOrFile: '$(Build.SourcesDirectory)'
+              includeRootFolder: false
+              archiveType: 'tar'
+              tarCompression: 'gz'
+              archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).tgz'
+              replaceExistingArchive: true
+            displayName: 'Create Plan Artifact'
+
+          - task: PublishBuildArtifacts@1
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+              ArtifactName: 'drop'
+              publishLocation: 'Container'
+            displayName: 'Publish Plan Artifact'
+
+  - stage: Deploy
+    jobs:
+      - job: Deploy
+
+        pool:
+          vmImage: 'ubuntu-latest'
+
+        steps:
+          - checkout: none
+
+          - task: DownloadBuildArtifacts@0
+            inputs:
+              artifactName: 'drop'
+            displayName: 'Download Plan Artifact'
+
+          - task: ExtractFiles@1
+            inputs:
+              archiveFilePatterns: '$(System.ArtifactsDirectory)/drop/$(Build.BuildId).tgz'
+              destinationFolder: '$(System.DefaultWorkingDirectory)/'
+              cleanDestinationFolder: false
+            displayName: 'Extract Plan Artifact'
+
+          - task: Bash@3
+            inputs:
+              filePath: './scripts/terraform-download.sh'
+            displayName: 'Terraform Download'
+
+          - task: AzureCLI@1
+            inputs:
+              azureSubscription: 'Azure MSDN'
+              scriptLocation: 'scriptPath'
+              scriptPath: './scripts/environment-setup.sh'
+              addSpnToEnvironment: true
+              failOnStandardError: true
+            displayName: 'Environment Setup'
+
+          - task: Bash@3
+            inputs:
+              filePath: './scripts/terraform-apply.sh'
+              arguments: '$(Build.SourcesDirectory)'
+              failOnStderr: true
+            env:
+              ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
+              ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
+              ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
+              ARM_TENANT_ID: $(AZURE_TENANT_ID)
+            displayName: 'Terraform Apply'
