@@ -83,48 +83,51 @@ stages:
 
   - stage: Deploy
     jobs:
-      - job: Deploy
-
+      - deployment: DeployDev
+        displayName: 'Dev Environment Deployment'
         pool:
           vmImage: 'ubuntu-latest'
+        environment: 'dev'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: none
 
-        steps:
-          - checkout: none
+                - task: DownloadBuildArtifacts@0
+                  inputs:
+                    artifactName: 'drop'
+                  displayName: 'Download Plan Artifact'
 
-          - task: DownloadBuildArtifacts@0
-            inputs:
-              artifactName: 'drop'
-            displayName: 'Download Plan Artifact'
+                - task: ExtractFiles@1
+                  inputs:
+                    archiveFilePatterns: '$(System.ArtifactsDirectory)/drop/$(Build.BuildId).tgz'
+                    destinationFolder: '$(System.DefaultWorkingDirectory)/'
+                    cleanDestinationFolder: false
+                  displayName: 'Extract Plan Artifact'
 
-          - task: ExtractFiles@1
-            inputs:
-              archiveFilePatterns: '$(System.ArtifactsDirectory)/drop/$(Build.BuildId).tgz'
-              destinationFolder: '$(System.DefaultWorkingDirectory)/'
-              cleanDestinationFolder: false
-            displayName: 'Extract Plan Artifact'
+                - task: Bash@3
+                  inputs:
+                    filePath: './scripts/terraform-download.sh'
+                  displayName: 'Terraform Download'
 
-          - task: Bash@3
-            inputs:
-              filePath: './scripts/terraform-download.sh'
-            displayName: 'Terraform Download'
+                - task: AzureCLI@1
+                  inputs:
+                    azureSubscription: 'Azure MSDN'
+                    scriptLocation: 'scriptPath'
+                    scriptPath: './scripts/environment-setup.sh'
+                    addSpnToEnvironment: true
+                    failOnStandardError: true
+                  displayName: 'Environment Setup'
 
-          - task: AzureCLI@1
-            inputs:
-              azureSubscription: 'Azure MSDN'
-              scriptLocation: 'scriptPath'
-              scriptPath: './scripts/environment-setup.sh'
-              addSpnToEnvironment: true
-              failOnStandardError: true
-            displayName: 'Environment Setup'
-
-          - task: Bash@3
-            inputs:
-              filePath: './scripts/terraform-apply.sh'
-              arguments: '$(Build.SourcesDirectory)'
-              failOnStderr: true
-            env:
-              ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
-              ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
-              ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
-              ARM_TENANT_ID: $(AZURE_TENANT_ID)
-            displayName: 'Terraform Apply'
+                - task: Bash@3
+                  inputs:
+                    filePath: './scripts/terraform-apply.sh'
+                    arguments: '$(Build.SourcesDirectory)'
+                    failOnStderr: true
+                  env:
+                    ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
+                    ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
+                    ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
+                    ARM_TENANT_ID: $(AZURE_TENANT_ID)
+                  displayName: 'Terraform Apply'
