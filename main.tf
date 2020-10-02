@@ -15,7 +15,7 @@ resource "azurerm_resource_group" "rg" {
   location = local.resource_location
 
   tags = {
-    environment = "TF sandbox"
+    environment = "demo"
   }
 }
 
