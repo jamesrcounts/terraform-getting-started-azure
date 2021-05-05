@@ -1,8 +1,3 @@
-# Configure the provider
-provider "azurerm" {
-  version = "~> 2.30"
-  features {}
-}
 
 # Common variables
 locals {
