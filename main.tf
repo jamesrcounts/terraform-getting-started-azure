@@ -1,31 +1,15 @@
-
-# Common variables
-locals {
-  resource_location = "westus2"
-}
-
-# Create a new resource group
-resource "azurerm_resource_group" "rg" {
-  name     = "myTFResourceGroup"
-  location = local.resource_location
-
-  tags = {
-    environment = "demo"
-  }
-}
-
 # Create virtual network
 resource "azurerm_virtual_network" "vnet" {
   name                = "myTFVnet"
   address_space       = ["10.0.0.0/16"]
-  location            = local.resource_location
-  resource_group_name = azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
 }
 
 # Create subnet
 resource "azurerm_subnet" "subnet" {
   name                 = "myTFSubnet"
-  resource_group_name  = azurerm_resource_group.rg.name
+  resource_group_name  = data.azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefixes     = ["10.0.1.0/24"]
 }
@@ -33,16 +17,16 @@ resource "azurerm_subnet" "subnet" {
 # Create public IP
 resource "azurerm_public_ip" "publicip" {
   name                = "myTFPublicIP"
-  location            = local.resource_location
-  resource_group_name = azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
   allocation_method   = "Dynamic"
 }
 
 # Create Network Security Group and rule
 resource "azurerm_network_security_group" "nsg" {
   name                = "myTFNSG"
-  location            = local.resource_location
-  resource_group_name = azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
 
   security_rule {
     name                       = "SSH"
@@ -60,8 +44,8 @@ resource "azurerm_network_security_group" "nsg" {
 # Create network interface
 resource "azurerm_network_interface" "nic" {
   name                = "myNIC"
-  location            = local.resource_location
-  resource_group_name = azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
 
   ip_configuration {
     name                          = "myNICConfg"
@@ -79,8 +63,8 @@ resource "azurerm_network_interface_security_group_association" "nsg_to_nic" {
 # Create a Linux virtual machine
 resource "azurerm_virtual_machine" "vm" {
   name                  = "myTFVM"
-  location              = local.resource_location
-  resource_group_name   = azurerm_resource_group.rg.name
+  location              = data.azurerm_resource_group.rg.location
+  resource_group_name   = data.azurerm_resource_group.rg.name
   network_interface_ids = [azurerm_network_interface.nic.id]
   vm_size               = "Standard_DS1_v2"
 
