@@ -15,7 +15,7 @@ validate:
 	terraform validate
 
 config:
-	@echo 'resource_group_name="rg-factual-stinkbug"' >> terraform.auto.tfvars
+	@echo 'resource_group_name="rg-factual-stinkbug"' > terraform.auto.tfvars
 
 plan: config fmt validate
 	terraform plan -out plan.tfplan
