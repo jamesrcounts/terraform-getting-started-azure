@@ -8,14 +8,17 @@ init:
 	terraform -v
 	terraform providers
 	
-clean:
+clean: config
 	terraform destroy -auto-approve
 	
 validate:
 	terraform validate
 
-plan: fmt validate
-	terraform plan -out plan.tfplan -var 'resource_group_name=rg-factual-stinkbug'
+config:
+	@echo 'resource_group_name="rg-factual-stinkbug"' >> terraform.auto.tfvars
+
+plan: config fmt validate
+	terraform plan -out plan.tfplan
 	
 apply:
 	terraform apply plan.tfplan

@@ -1,18 +1,8 @@
-# Create virtual network
-resource "azurerm_virtual_network" "vnet" {
-  name                = "myTFVnet"
-  address_space       = ["10.0.0.0/16"]
-  location            = data.azurerm_resource_group.rg.location
-  resource_group_name = data.azurerm_resource_group.rg.name
+# Common variables shared by multiple resources
+locals {
+  instance_id = data.azurerm_resource_group.rg.tags["instance_id"]
 }
 
-# Create subnet
-resource "azurerm_subnet" "subnet" {
-  name                 = "myTFSubnet"
-  resource_group_name  = data.azurerm_resource_group.rg.name
-  virtual_network_name = azurerm_virtual_network.vnet.name
-  address_prefixes     = ["10.0.1.0/24"]
-}
 
 # Create public IP
 resource "azurerm_public_ip" "publicip" {
