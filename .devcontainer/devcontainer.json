@@ -1,9 +1,9 @@
 {
-	"name": "Azure Terraform (Community)",
+	"name": "Terraform: Getting Started",
 	"build": {
 		"dockerfile": "Dockerfile",
 		"args": { 
-			"TERRAFORM_VERSION": "0.15.1",
+			"TERRAFORM_VERSION": "0.15.2",
 			"TFLINT_VERSION": "0.28.0",
 			"INSTALL_AZURE_CLI": "true",
 			"INSTALL_DOCKER": "true",
