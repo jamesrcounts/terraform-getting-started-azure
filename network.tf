@@ -9,8 +9,7 @@ resource "azurerm_virtual_network" "vnet" {
 
 # Create subnet
 resource "azurerm_subnet" "subnet" {
-  # address_prefixes     = ["10.0.1.0/24"]
-  address_prefixes     = ["10.0.1.0/24"]
+  address_prefixes     = [cidrsubnet(azurerm_virtual_network.vnet.address_space.0, 8, 1)]
   name                 = "virtual-machines"
   resource_group_name  = data.azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.vnet.name
