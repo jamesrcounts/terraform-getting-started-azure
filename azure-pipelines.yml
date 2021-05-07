@@ -13,6 +13,8 @@ variables:
     value: true
   - name: project_folder
     value: .
+  - name: AZURE_ENV_RG
+    value: rg-factual-stinkbug
 
 stages:
   - stage: Build
@@ -69,16 +71,26 @@ stages:
                 terraform providers
 
           - task: Bash@3
-            inputs:
-              filePath: './scripts/terraform-plan.sh'
-              arguments: '$(Build.SourcesDirectory)'
-              failOnStderr: true
+            displayName: 'Terraform Plan'
             env:
               ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
               ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
               ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
               ARM_TENANT_ID: $(AZURE_TENANT_ID)
-            displayName: 'Terraform Plan'
+            inputs:
+              targetType: 'inline'
+              workingDirectory: $(project_folder)
+              script: |
+                set -euo pipefail
+
+                if [ ${BUILD_REASON} == 'PullRequest' ]; then
+                  export TF_CLI_ARGS="-lock=false"
+                fi
+
+                terraform plan \
+                  -input=false \
+                  -var="resource_group_name=${AZURE_ENV_RG}" \
+                  -out ${BUILD_BUILDNUMBER}.tfplan
 
           - task: ArchiveFiles@2
             inputs:
