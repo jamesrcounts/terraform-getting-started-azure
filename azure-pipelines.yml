@@ -10,6 +10,8 @@ variables:
   - group: terraform-version
   - name: tf_in_automation
     value: true
+  - name: project_folder
+    value: .
 
 stages:
   - stage: Build
