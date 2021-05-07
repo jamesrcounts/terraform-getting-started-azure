@@ -3,32 +3,12 @@ locals {
   instance_id = data.azurerm_resource_group.rg.tags["instance_id"]
 }
 
-
 # Create public IP
 resource "azurerm_public_ip" "publicip" {
   name                = "myTFPublicIP"
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
   allocation_method   = "Dynamic"
-}
-
-# Create Network Security Group and rule
-resource "azurerm_network_security_group" "nsg" {
-  name                = "myTFNSG"
-  location            = data.azurerm_resource_group.rg.location
-  resource_group_name = data.azurerm_resource_group.rg.name
-
-  security_rule {
-    name                       = "SSH"
-    priority                   = 1001
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "22"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
 }
 
 # Create network interface
@@ -45,10 +25,7 @@ resource "azurerm_network_interface" "nic" {
   }
 }
 
-resource "azurerm_network_interface_security_group_association" "nsg_to_nic" {
-  network_interface_id      = azurerm_network_interface.nic.id
-  network_security_group_id = azurerm_network_security_group.nsg.id
-}
+
 
 # Create a Linux virtual machine
 resource "azurerm_virtual_machine" "vm" {
