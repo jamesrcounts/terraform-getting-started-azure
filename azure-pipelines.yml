@@ -28,7 +28,7 @@ stages:
           - checkout: self
             fetchDepth: 1
 
-          - template: '../pipeline-templates/pin-terraform.yml'
+          - template: 'pipeline-templates/pin-terraform.yml'
 
           - task: AzureCLI@1
             inputs:
@@ -131,7 +131,7 @@ stages:
                     cleanDestinationFolder: false
                   displayName: 'Extract Plan Artifact'
 
-                - template: '../pipeline-templates/pin-terraform.yml'
+                - template: 'pipeline-templates/pin-terraform.yml'
 
                 - task: AzureCLI@1
                   inputs:
