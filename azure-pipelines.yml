@@ -28,10 +28,7 @@ stages:
           - checkout: self
             fetchDepth: 1
 
-          - task: Bash@3
-            inputs:
-              filePath: './scripts/terraform-download.sh'
-            displayName: 'Terraform Download'
+          - template: '../pipeline-templates/pin-terraform.yml'
 
           - task: AzureCLI@1
             inputs:
@@ -134,10 +131,7 @@ stages:
                     cleanDestinationFolder: false
                   displayName: 'Extract Plan Artifact'
 
-                - task: Bash@3
-                  inputs:
-                    filePath: './scripts/terraform-download.sh'
-                  displayName: 'Terraform Download'
+                - template: '../pipeline-templates/pin-terraform.yml'
 
                 - task: AzureCLI@1
                   inputs:
