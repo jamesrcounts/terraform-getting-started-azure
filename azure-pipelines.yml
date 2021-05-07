@@ -33,7 +33,7 @@ stages:
 
           - task: AzureCLI@1
             inputs:
-              azureSubscription: 'Azure MSDN'
+              azureSubscription: 'Azure'
               scriptLocation: 'scriptPath'
               scriptPath: './scripts/environment-setup.sh'
               addSpnToEnvironment: true
@@ -113,7 +113,7 @@ stages:
 
                 - task: AzureCLI@1
                   inputs:
-                    azureSubscription: 'Azure MSDN'
+                    azureSubscription: 'Azure'
                     scriptLocation: 'scriptPath'
                     scriptPath: './scripts/environment-setup.sh'
                     addSpnToEnvironment: true
