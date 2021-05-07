@@ -4,7 +4,7 @@ trigger:
   batch: true
   branches:
     include:
-      - master
+      - azureaiconf.6.21
 
 variables:
   - group: terraform-version
