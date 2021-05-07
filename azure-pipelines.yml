@@ -38,16 +38,32 @@ stages:
             displayName: 'Environment Setup'
 
           - task: Bash@3
-            inputs:
-              filePath: './scripts/terraform-init.sh'
-              arguments: '$(Build.SourcesDirectory)'
-              failOnStderr: true
+            displayName: 'Terraform Init'
             env:
               ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
               ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
               ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
               ARM_TENANT_ID: $(AZURE_TENANT_ID)
-            displayName: 'Terraform Init'
+            inputs:
+              targetType: 'inline'
+              workingDirectory: $(project_folder)
+              script: |
+                set -euo pipefail
+                
+                echo "Initialize"
+                terraform init \
+                  -input=false \
+                  -backend-config="resource_group_name=${TF_STORAGE_RG}" \
+                  -backend-config="storage_account_name=${TF_STORAGE_ACCOUNT}" \
+                  -backend-config="container_name=${TF_STORAGE_BLOB_CONTAINER}" \
+                  -backend-config="key=${TF_STORAGE_BLOB_NAME}" 
+
+                echo "Sanity Check"
+                terraform validate
+
+                echo "Show Terraform Version and Providers"
+                terraform -v
+                terraform providers
 
           - task: Bash@3
             inputs:
