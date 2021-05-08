@@ -69,7 +69,7 @@ stages:
               includeRootFolder: false
               archiveType: 'tar'
               tarCompression: 'gz'
-              archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).tgz'
+              archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildNumber).tgz'
               replaceExistingArchive: true
 
           - task: PublishPipelineArtifact@1
