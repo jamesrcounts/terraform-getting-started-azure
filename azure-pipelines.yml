@@ -93,7 +93,7 @@ stages:
                   displayName: 'Extract Plan Artifact'
                   inputs:
                     archiveFilePatterns: '$(Pipeline.Workspace)/plan/$(Build.BuildNumber).tgz'
-                    destinationFolder: '$(project_folder)/'
+                    destinationFolder: '$(project_folder)'
                     cleanDestinationFolder: true
 
                 - template: 'pipeline-templates/prepare-credentials.yml'
