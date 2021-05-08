@@ -56,11 +56,15 @@ stages:
                   export TF_CLI_ARGS="-lock=false"
                 fi
 
-                terraform plan \
-                  -detailed-exitcode \
-                  -input=false \
-                  -var="resource_group_name=${AZURE_ENV_RG}" \
-                  -out ${BUILD_BUILDNUMBER}.tfplan
+                $(
+                  terraform plan \
+                    -detailed-exitcode \
+                    -input=false \
+                    -var="resource_group_name=${AZURE_ENV_RG}" \
+                    -out ${BUILD_BUILDNUMBER}.tfplan
+                )
+
+                echo "Terraform exit code: $?"
 
           - task: ArchiveFiles@2
             condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
