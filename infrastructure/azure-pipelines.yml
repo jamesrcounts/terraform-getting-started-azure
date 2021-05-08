@@ -69,21 +69,21 @@ stages:
 
                 echo "Terraform exit code: ${terraform_exit_code}"
 
-                # Terraform plan returns 1 on errors; other codes are forms of success
-                if [ ${terraform_exit_code} -eq 1 ]; then
-                  exit ${terraform_exit_code}
+                # Terraform plan returns 2 when there are changes
+                if [ ${terraform_exit_code} -eq 2 ]; then
+                  # Output that terraform apply is needed
+                  echo "##vso[task.setvariable variable=tf_apply;isOutput=true]true"
+
+                  # Override the exit code
+                  exit 0
                 fi
 
-                # Terraform returns 0 when there are no changes
-                if [ ${terraform_exit_code} -eq 0 ]; then
-                  echo "##vso[task.setvariable variable=tf_apply;isOutput=true]false"
-                  exit ${terraform_exit_code}
-                fi
+                # Terraform plan returns 0 for no-op plans, and 1 for errors
+                # In either case, terraform apply is not needed
+                echo "##vso[task.setvariable variable=tf_apply;isOutput=true]false"
 
-                # There are changes
-                echo "##vso[task.setvariable variable=tf_apply;isOutput=true]true"
-                exit 0
-
+                # Return the original exit code from terraform plan
+                exit ${terraform_exit_code}
 
           - task: ArchiveFiles@2
             condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), eq(variables['terraform_plan.tf_apply'], 'true'))
