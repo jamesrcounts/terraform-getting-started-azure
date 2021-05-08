@@ -74,13 +74,7 @@ stages:
           runOnce:
             deploy:
               steps:
-                - task: ExtractFiles@1
-                  displayName: 'Extract Plan Artifact'
-                  inputs:
-                    archiveFilePatterns: '$(Pipeline.Workspace)/plan/$(Build.BuildNumber).tgz'
-                    destinationFolder: '$(project_folder)/'
-                    cleanDestinationFolder: true
-
+                - template: '../pipeline-templates/extract-plan.yml'
                 - template: '../pipeline-templates/prepare-credentials.yml'
                 - template: '../pipeline-templates/pin-terraform.yml'
 
