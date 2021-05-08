@@ -72,13 +72,6 @@ stages:
               archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).tgz'
               replaceExistingArchive: true
 
-          - task: PublishBuildArtifacts@1
-            inputs:
-              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-              ArtifactName: 'drop'
-              publishLocation: 'Container'
-            displayName: 'Publish Plan Artifact'
-
           - task: PublishPipelineArtifact@1
             condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
             displayName: 'Publish Plan Artifact'
@@ -86,30 +79,22 @@ stages:
               targetPath: '$(Build.ArtifactStagingDirectory)'
               artifactName: 'plan'
 
-  - stage: Deploy
+  - stage: deploy
     jobs:
-      - deployment: DeployDev
-        displayName: 'Dev Environment Deployment'
-        pool:
-          vmImage: 'ubuntu-latest'
+      - deployment: terraform
+        condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+        displayName: 'Change Infrastructure'
         environment: 'dev'
         strategy:
           runOnce:
             deploy:
               steps:
-                - checkout: none
-
-                - task: DownloadBuildArtifacts@0
-                  inputs:
-                    artifactName: 'drop'
-                  displayName: 'Download Plan Artifact'
-
                 - task: ExtractFiles@1
-                  inputs:
-                    archiveFilePatterns: '$(System.ArtifactsDirectory)/drop/$(Build.BuildId).tgz'
-                    destinationFolder: '$(System.DefaultWorkingDirectory)/'
-                    cleanDestinationFolder: false
                   displayName: 'Extract Plan Artifact'
+                  inputs:
+                    archiveFilePatterns: '$(Pipeline.Workspace)/plan/$(Build.BuildNumber).tgz'
+                    destinationFolder: '$(project_folder)/'
+                    cleanDestinationFolder: true
 
                 - template: 'pipeline-templates/prepare-credentials.yml'
                 - template: 'pipeline-templates/pin-terraform.yml'
