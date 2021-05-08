@@ -100,13 +100,18 @@ stages:
                 - template: '../pipeline-templates/pin-terraform.yml'
 
                 - task: Bash@3
-                  inputs:
-                    filePath: '../scripts/terraform-apply.sh'
-                    arguments: '$(Build.SourcesDirectory)'
-                    failOnStderr: true
+                  displayName: 'Terraform Apply'
                   env:
                     ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
                     ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
                     ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
                     ARM_TENANT_ID: $(AZURE_TENANT_ID)
-                  displayName: 'Terraform Apply'
+                  inputs:
+                    targetType: 'inline'
+                    workingDirectory: $(project_folder)
+                    script: |
+                      set -euo pipefail
+      
+                      terraform apply \
+                        -input=false \
+                        ${BUILD_BUILDNUMBER}.tfplan
