@@ -28,16 +28,8 @@ stages:
           - checkout: self
             fetchDepth: 1
 
+          - template: 'pipeline-templates/prepare-credentials.yml'
           - template: 'pipeline-templates/pin-terraform.yml'
-
-          - task: AzureCLI@1
-            inputs:
-              azureSubscription: 'Azure'
-              scriptLocation: 'scriptPath'
-              scriptPath: './scripts/environment-setup.sh'
-              addSpnToEnvironment: true
-              failOnStandardError: true
-            displayName: 'Environment Setup'
 
           - task: Bash@3
             displayName: 'Terraform Init'
@@ -131,16 +123,8 @@ stages:
                     cleanDestinationFolder: false
                   displayName: 'Extract Plan Artifact'
 
+                - template: 'pipeline-templates/prepare-credentials.yml'
                 - template: 'pipeline-templates/pin-terraform.yml'
-
-                - task: AzureCLI@1
-                  inputs:
-                    azureSubscription: 'Azure'
-                    scriptLocation: 'scriptPath'
-                    scriptPath: './scripts/environment-setup.sh'
-                    addSpnToEnvironment: true
-                    failOnStandardError: true
-                  displayName: 'Environment Setup'
 
                 - task: Bash@3
                   inputs:
