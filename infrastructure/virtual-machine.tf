@@ -1,12 +1,12 @@
 # Create a Linux virtual machine
 resource "azurerm_linux_virtual_machine" "vm" {
+  admin_password                  = random_password.admin_password.result
+  admin_username                  = "plankton"
+  disable_password_authentication = false
+  location                        = data.azurerm_resource_group.rg.location
   name                            = "vm-${local.instance_id}"
   resource_group_name             = data.azurerm_resource_group.rg.name
-  location                        = data.azurerm_resource_group.rg.location
   size                            = "Standard_DS1_v2"
-  admin_username                  = "plankton"
-  admin_password                  = "Password1234!"
-  disable_password_authentication = false
   tags                            = data.azurerm_resource_group.rg.tags
 
   network_interface_ids = [
@@ -29,4 +29,10 @@ resource "azurerm_linux_virtual_machine" "vm" {
     sku       = "16.04-LTS"
     version   = "latest"
   }
+}
+
+resource "random_password" "admin_password" {
+  length           = 16
+  override_special = "_%@"
+  special          = true
 }
