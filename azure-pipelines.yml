@@ -62,14 +62,15 @@ stages:
                   -out ${BUILD_BUILDNUMBER}.tfplan
 
           - task: ArchiveFiles@2
+            condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+            displayName: 'Create Plan Artifact'
             inputs:
-              rootFolderOrFile: '$(Build.SourcesDirectory)'
+              rootFolderOrFile: '$(project_folder)'
               includeRootFolder: false
               archiveType: 'tar'
               tarCompression: 'gz'
               archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).tgz'
               replaceExistingArchive: true
-            displayName: 'Create Plan Artifact'
 
           - task: PublishBuildArtifacts@1
             inputs:
@@ -77,6 +78,13 @@ stages:
               ArtifactName: 'drop'
               publishLocation: 'Container'
             displayName: 'Publish Plan Artifact'
+
+          - task: PublishPipelineArtifact@1
+            condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+            displayName: 'Publish Plan Artifact'
+            inputs:
+              targetPath: '$(Build.ArtifactStagingDirectory)'
+              artifactName: 'plan'
 
   - stage: Deploy
     jobs:
