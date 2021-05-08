@@ -1,4 +1,4 @@
-name: 0.1.$(Rev:r)
+name: 0.2.$(Rev:r)
 
 trigger:
   batch: true
@@ -6,15 +6,24 @@ trigger:
     include:
       - azureaiconf.6.21
 
+pr:
+  autoCancel: true
+  drafts: true
+  branches:
+    include:
+      - azureaiconf.6.21
+
+pool:
+  vmImage: ubuntu-latest
+  
 variables:
+  - group: azure-env
   - group: terraform-backend
   - group: terraform-version
   - name: tf_in_automation
     value: true
   - name: project_folder
     value: .
-  - name: AZURE_ENV_RG
-    value: rg-factual-stinkbug
 
 stages:
   - stage: Build
