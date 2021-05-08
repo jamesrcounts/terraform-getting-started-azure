@@ -4,14 +4,14 @@ trigger:
   batch: true
   branches:
     include:
-      - master
+      - main
 
 pr:
   autoCancel: true
   drafts: true
   branches:
     include:
-      - master
+      - main
 
 pool:
   vmImage: ubuntu-latest
