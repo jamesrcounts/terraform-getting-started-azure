@@ -23,7 +23,7 @@ variables:
   - name: tf_in_automation
     value: true
   - name: project_folder
-    value: .
+    value: infrastructure
 
 stages:
   - stage: 'build'
