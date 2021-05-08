@@ -62,23 +62,7 @@ stages:
                   -var="resource_group_name=${AZURE_ENV_RG}" \
                   -out ${BUILD_BUILDNUMBER}.tfplan
 
-          - task: ArchiveFiles@2
-            condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
-            displayName: 'Create Plan Artifact'
-            inputs:
-              rootFolderOrFile: '$(project_folder)'
-              includeRootFolder: false
-              archiveType: 'tar'
-              tarCompression: 'gz'
-              archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildNumber).tgz'
-              replaceExistingArchive: true
-
-          - task: PublishPipelineArtifact@1
-            condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
-            displayName: 'Publish Plan Artifact'
-            inputs:
-              targetPath: '$(Build.ArtifactStagingDirectory)'
-              artifactName: 'plan'
+          - template: '../pipeline-templates/publish-plan.yml'
 
   - stage: deploy
     jobs:
