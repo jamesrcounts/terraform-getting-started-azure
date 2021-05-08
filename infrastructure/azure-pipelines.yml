@@ -1,0 +1,96 @@
+name: 0.2.$(Rev:r)
+
+trigger:
+  batch: true
+  branches:
+    include:
+      - master
+
+pr:
+  autoCancel: true
+  drafts: true
+  branches:
+    include:
+      - master
+
+pool:
+  vmImage: ubuntu-latest
+  
+variables:
+  - group: azure-env
+  - group: terraform-backend
+  - group: terraform-version
+  - name: tf_in_automation
+    value: true
+  - name: project_folder
+    value: infrastructure
+
+stages:
+  - stage: build
+
+    jobs:
+      - job: plan
+        displayName: 'Infrastructure Plan'
+        steps:
+          - checkout: self
+            fetchDepth: 1
+
+          - template: '../pipeline-templates/prepare-credentials.yml'
+          - template: '../pipeline-templates/pin-terraform.yml'
+          - template: '../pipeline-templates/terraform-init.yml'
+
+          - task: Bash@3
+            name: 'terraform_plan'
+            displayName: 'Terraform Plan'
+            env:
+              ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
+              ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
+              ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
+              ARM_TENANT_ID: $(AZURE_TENANT_ID)
+            inputs:
+              targetType: 'inline'
+              workingDirectory: $(project_folder)
+              script: |
+                set -euo pipefail
+
+                if [ ${BUILD_REASON} == 'PullRequest' ]; then
+                  export TF_CLI_ARGS="-lock=false"
+                fi
+
+                terraform plan \
+                  -input=false \
+                  -var="resource_group_name=${AZURE_ENV_RG}" \
+                  -out ${BUILD_BUILDNUMBER}.tfplan
+
+          - template: '../pipeline-templates/publish-plan.yml'
+
+  - stage: deploy
+    jobs:
+      - deployment: terraform
+        condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+        displayName: 'Change Infrastructure'
+        environment: 'dev'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: '../pipeline-templates/extract-plan.yml'
+                - template: '../pipeline-templates/prepare-credentials.yml'
+                - template: '../pipeline-templates/pin-terraform.yml'
+
+                - task: Bash@3
+                  displayName: 'Terraform Apply'
+                  env:
+                    ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
+                    ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
+                    ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
+                    ARM_TENANT_ID: $(AZURE_TENANT_ID)
+                  inputs:
+                    targetType: 'inline'
+                    workingDirectory: $(project_folder)
+                    script: |
+                      set -euo pipefail
+      
+                      terraform apply \
+                        -input=false \
+                        ${BUILD_BUILDNUMBER}.tfplan

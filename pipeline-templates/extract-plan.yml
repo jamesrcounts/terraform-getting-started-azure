@@ -1,0 +1,7 @@
+steps:
+  - task: ExtractFiles@1
+    displayName: 'Extract Plan Artifact'
+    inputs:
+      archiveFilePatterns: '$(Pipeline.Workspace)/plan/$(Build.BuildNumber).tgz'
+      destinationFolder: '$(project_folder)/'
+      cleanDestinationFolder: true

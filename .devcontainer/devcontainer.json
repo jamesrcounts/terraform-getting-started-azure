@@ -1,10 +1,10 @@
 {
-	"name": "Azure Terraform (Community)",
+	"name": "Terraform: Getting Started",
 	"build": {
 		"dockerfile": "Dockerfile",
 		"args": { 
-			"TERRAFORM_VERSION": "0.12.29",
-			"TFLINT_VERSION": "0.18.0",
+			"TERRAFORM_VERSION": "0.15.3",
+			"TFLINT_VERSION": "0.28.0",
 			"INSTALL_AZURE_CLI": "true",
 			"INSTALL_DOCKER": "true",
 			"INSTALL_NODE": "false"
@@ -14,7 +14,12 @@
 
 	// Set *default* container specific settings.json values on container create.
 	"settings": { 
-		"terminal.integrated.shell.linux": "/bin/bash"
+		"terminal.integrated.shell.linux": "/usr/bin/zsh",
+		"terraform.languageServer": {
+			"enabled": true,
+			"args": []
+		},
+		"azureTerraform.terminal": "integrated"
 	},
 
 	// Add the IDs of extensions you want installed when the container is created.
