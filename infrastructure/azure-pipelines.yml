@@ -40,6 +40,7 @@ stages:
           - template: '../pipeline-templates/terraform-init.yml'
 
           - task: Bash@3
+            name: 'terraform_plan'
             displayName: 'Terraform Plan'
             env:
               ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
@@ -82,7 +83,7 @@ stages:
                 echo "##vso[task.setvariable variable=tf_apply;isOutput=true]true"
 
           - task: ArchiveFiles@2
-            condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+            condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), eq(variables['terraform_plan.tf_apply'], 'true'))
             displayName: 'Create Plan Artifact'
             inputs:
               rootFolderOrFile: '$(project_folder)'
@@ -93,7 +94,7 @@ stages:
               replaceExistingArchive: true
 
           - task: PublishPipelineArtifact@1
-            condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+            condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), eq(variables['terraform_plan.tf_apply'], 'true'))
             displayName: 'Publish Plan Artifact'
             inputs:
               targetPath: '$(Build.ArtifactStagingDirectory)'
