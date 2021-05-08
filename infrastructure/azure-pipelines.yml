@@ -35,9 +35,9 @@ stages:
           - checkout: self
             fetchDepth: 1
 
-          - template: 'pipeline-templates/prepare-credentials.yml'
-          - template: 'pipeline-templates/pin-terraform.yml'
-          - template: 'pipeline-templates/terraform-init.yml'
+          - template: '../pipeline-templates/prepare-credentials.yml'
+          - template: '../pipeline-templates/pin-terraform.yml'
+          - template: '../pipeline-templates/terraform-init.yml'
 
           - task: Bash@3
             displayName: 'Terraform Plan'
@@ -96,12 +96,12 @@ stages:
                     destinationFolder: '$(project_folder)/'
                     cleanDestinationFolder: true
 
-                - template: 'pipeline-templates/prepare-credentials.yml'
-                - template: 'pipeline-templates/pin-terraform.yml'
+                - template: '../pipeline-templates/prepare-credentials.yml'
+                - template: '../pipeline-templates/pin-terraform.yml'
 
                 - task: Bash@3
                   inputs:
-                    filePath: './scripts/terraform-apply.sh'
+                    filePath: '../scripts/terraform-apply.sh'
                     arguments: '$(Build.SourcesDirectory)'
                     failOnStderr: true
                   env:
