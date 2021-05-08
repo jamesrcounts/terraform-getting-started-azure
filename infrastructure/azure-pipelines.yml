@@ -4,14 +4,14 @@ trigger:
   batch: true
   branches:
     include:
-      - azureaiconf.6.21
+      - master
 
 pr:
   autoCancel: true
   drafts: true
   branches:
     include:
-      - azureaiconf.6.21
+      - master
 
 pool:
   vmImage: ubuntu-latest
