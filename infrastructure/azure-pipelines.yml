@@ -26,10 +26,10 @@ variables:
     value: infrastructure
 
 stages:
-  - stage: 'build'
+  - stage: build
 
     jobs:
-      - job: 
+      - job: plan
         displayName: 'Infrastructure Plan'
         steps:
           - checkout: self
@@ -66,8 +66,6 @@ stages:
                   -out ${BUILD_BUILDNUMBER}.tfplan
                 terraform_exit_code=$?
                 set -e
-
-                echo "Terraform exit code: ${terraform_exit_code}"
 
                 # Terraform plan returns 2 when there are changes
                 if [ ${terraform_exit_code} -eq 2 ]; then
@@ -106,7 +104,7 @@ stages:
   - stage: deploy
     jobs:
       - deployment: terraform
-        condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+        condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), eq(stageDependencies.build.plan.outputs['terraform_plan.tf_apply'], 'true'))
         displayName: 'Change Infrastructure'
         environment: 'dev'
         strategy:
