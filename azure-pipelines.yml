@@ -26,13 +26,11 @@ variables:
     value: .
 
 stages:
-  - stage: Build
+  - stage: 'build'
+  
     jobs:
-      - job: Build
-
-        pool:
-          vmImage: 'ubuntu-latest'
-
+      - job: 
+        displayName: 'Infrastructure Plan'
         steps:
           - checkout: self
             fetchDepth: 1
