@@ -3,7 +3,7 @@
 	"build": {
 		"dockerfile": "Dockerfile",
 		"args": { 
-			"TERRAFORM_VERSION": "0.15.3",
+			"TERRAFORM_VERSION": "0.15.4",
 			"TFLINT_VERSION": "0.28.0",
 			"INSTALL_AZURE_CLI": "true",
 			"INSTALL_DOCKER": "true",
@@ -14,7 +14,7 @@
 
 	// Set *default* container specific settings.json values on container create.
 	"settings": { 
-		"terminal.integrated.shell.linux": "/usr/bin/zsh",
+		"terminal.integrated.defaultProfile.linux": "zsh",
 		"terraform.languageServer": {
 			"enabled": true,
 			"args": []
