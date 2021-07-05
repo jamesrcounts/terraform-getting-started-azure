@@ -38,4 +38,4 @@ all: init plan
 login:
 	az login
 	az account set --subscription "Jim Counts (MSDN)"
-	az account show
+	az account show --output table
