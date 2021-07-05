@@ -19,6 +19,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
 
   os_disk {
     caching              = "ReadWrite"
+    disk_size_gb         = 1024
     storage_account_type = "Premium_LRS"
     name                 = "vm-${local.instance_id}-os"
   }
@@ -33,6 +34,10 @@ resource "azurerm_linux_virtual_machine" "vm" {
 
 resource "random_password" "admin_password" {
   length           = 16
+  min_lower        = 1
+  min_numeric      = 1
+  min_special      = 1
+  min_upper        = 1
   override_special = "_%@"
   special          = true
 }

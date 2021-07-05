@@ -1,5 +1,8 @@
 default: all
 
+backend_instance_id := apparent-dove
+instance_id := awaited-tuna
+
 fmt:
 	terraform fmt -recursive
 
@@ -14,8 +17,14 @@ clean: config
 validate:
 	terraform validate
 
+backend_config:
+	az keyvault secret download \
+		--name azurerm-backend-tfvars \
+		--vault-name kv-$(backend_instance_id) \
+		--file azurerm.backend.tfvars
+
 config:
-	@echo 'resource_group_name="rg-factual-stinkbug"' > terraform.auto.tfvars
+	@echo 'resource_group_name="rg-$(instance_id)"' > terraform.auto.tfvars
 
 plan: config fmt validate
 	terraform plan -out plan.tfplan
