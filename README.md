@@ -34,8 +34,9 @@ Read on for instructions on how to use this example.
 
 For a more complete walk-through, including examples of using this demo with remote state and pipelines check out these articles:
 
-1. 2021 - Update (coming soon!)
+1. 2021 - [Terraform Pipelines with Azure Devops: Getting Started][3]
 1. 2019 - [Safe Terraform Pipelines with Azure DevOps][2]
 
 [1]: https://learn.hashicorp.com/collections/terraform/azure-get-started
 [2]: http://jamesrcounts.com/2019/10/14/azdo-safe-terraform-pipelines.html
+[3]: http://jamesrcounts.com/2021/07/07/terraform-pipelines-with-azure-devops.html
