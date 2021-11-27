@@ -36,6 +36,6 @@ apply:
 all: init plan
 
 login:
-	az login
-	az account set --subscription "Jim Counts (MSDN)"
+	az login --use-device-code
+	az account set --subscription "Jim Counts (personal)"
 	az account show --output table
