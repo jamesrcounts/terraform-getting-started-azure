@@ -1,12 +1,12 @@
 default: all
 
-backend_instance_id := apparent-dove
-instance_id := awaited-tuna
+backend_instance_id := harmless-humpback
+instance_id := neat-deer
 
 fmt:
 	terraform fmt -recursive
 
-init:
+init: azurerm.backend.tfvars
 	terraform init --upgrade -backend-config azurerm.backend.tfvars
 	terraform -v
 	terraform providers
@@ -17,7 +17,7 @@ clean: config
 validate:
 	terraform validate
 
-backend_config:
+azurerm.backend.tfvars:
 	az keyvault secret download \
 		--name azurerm-backend-tfvars \
 		--vault-name kv-$(backend_instance_id) \
