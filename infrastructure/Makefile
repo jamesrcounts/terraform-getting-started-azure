@@ -1,5 +1,7 @@
 default: all
 
+CONFIG := terraform.auto.tfvars
+
 backend_instance_id := harmless-humpback
 env_subscription_id := 77fc5cff-a120-47a1-83bc-5c64163f872d
 env_instance_id     := neat-deer
@@ -12,7 +14,7 @@ init: azurerm.backend.tfvars
 	terraform -v
 	terraform providers
 	
-clean: config
+clean: $(CONFIG)
 	terraform destroy -auto-approve
 	
 validate:
@@ -24,12 +26,12 @@ azurerm.backend.tfvars:
 		--vault-name kv-$(backend_instance_id) \
 		--file azurerm.backend.tfvars
 
-terraform.auto.tfvars:
+$(CONFIG):
 	# TODO: this could also be loaded from keyvault
-	@echo 'resource_group_name="rg-$(env_instance_id)"'   > terraform.auto.tfvars
-	@echo 'env_subscription_id="$(env_subscription_id)"' >> terraform.auto.tfvars
+	@echo 'resource_group_name="rg-$(env_instance_id)"'   > $(CONFIG)
+	@echo 'env_subscription_id="$(env_subscription_id)"' >> $(CONFIG)
 
-plan: terraform.auto.tfvars fmt validate
+plan: $(CONFIG) fmt validate
 	terraform plan -out plan.tfplan
 	
 apply:
