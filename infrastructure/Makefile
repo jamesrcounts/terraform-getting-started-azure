@@ -1,32 +1,37 @@
 default: all
 
-backend_instance_id := apparent-dove
-instance_id := awaited-tuna
+CONFIG := terraform.auto.tfvars
+
+backend_instance_id := harmless-humpback
+env_subscription_id := 77fc5cff-a120-47a1-83bc-5c64163f872d
+env_instance_id     := neat-deer
 
 fmt:
 	terraform fmt -recursive
 
-init:
+init: azurerm.backend.tfvars
 	terraform init --upgrade -backend-config azurerm.backend.tfvars
 	terraform -v
 	terraform providers
 	
-clean: config
+clean: $(CONFIG)
 	terraform destroy -auto-approve
 	
 validate:
 	terraform validate
 
-backend_config:
+azurerm.backend.tfvars:
 	az keyvault secret download \
 		--name azurerm-backend-tfvars \
 		--vault-name kv-$(backend_instance_id) \
 		--file azurerm.backend.tfvars
 
-config:
-	@echo 'resource_group_name="rg-$(instance_id)"' > terraform.auto.tfvars
+$(CONFIG):
+	# TODO: this could also be loaded from keyvault
+	@echo 'resource_group_name="rg-$(env_instance_id)"'   > $(CONFIG)
+	@echo 'env_subscription_id="$(env_subscription_id)"' >> $(CONFIG)
 
-plan: config fmt validate
+plan: $(CONFIG) fmt validate
 	terraform plan -out plan.tfplan
 	
 apply:
@@ -36,6 +41,6 @@ apply:
 all: init plan
 
 login:
-	az login
-	az account set --subscription "Jim Counts (MSDN)"
+	az login --use-device-code
+	az account set --subscription "Jim Counts (personal)"
 	az account show --output table
