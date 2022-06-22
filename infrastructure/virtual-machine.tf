@@ -6,7 +6,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
   location                        = data.azurerm_resource_group.rg.location
   name                            = "vm-${local.instance_id}"
   resource_group_name             = data.azurerm_resource_group.rg.name
-  size                            = "XStandard_DS1_v2"
+  size                            = "Standard_DS1_v2"
   tags                            = data.azurerm_resource_group.rg.tags
 
   network_interface_ids = [
