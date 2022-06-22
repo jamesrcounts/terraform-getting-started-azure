@@ -15,7 +15,7 @@ pr:
 
 pool:
   vmImage: ubuntu-latest
-  
+
 variables:
   - group: azure-env
   - group: terraform-backend
@@ -38,6 +38,20 @@ stages:
           - template: '../pipeline-templates/prepare-credentials.yml'
           - template: '../pipeline-templates/pin-terraform.yml'
           - template: '../pipeline-templates/terraform-init.yml'
+
+          - task: Bash@3
+            name: 'lint'
+            displayName: 'tflint'
+            inputs:
+              targetType: 'inline'
+              workingDirectory: $(project_folder)
+              script: |
+                set -euo pipefail
+
+                curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+                tflint --init
+                tflint -v
+                tflint
 
           - task: Bash@3
             name: 'terraform_plan'
@@ -91,7 +105,7 @@ stages:
                     workingDirectory: $(project_folder)
                     script: |
                       set -euo pipefail
-      
+
                       terraform apply \
                         -input=false \
                         ${BUILD_BUILDNUMBER}.tfplan
