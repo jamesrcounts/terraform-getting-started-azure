@@ -54,6 +54,20 @@ stages:
                 tflint
 
           - task: Bash@3
+            displayName: 'Pin tfsec'
+            inputs:
+              targetType: 'inline'
+              script: |
+                set -euo pipefail
+
+                curl -SL "https://github.com/aquasecurity/tfsec/releases/download/v1.26.0/tfsec_1.26.0_linux_amd64.tar.gz" --output tfsec_1.26.0_linux_amd64.tar.gz
+                echo "424ad879c02b8b4ec793f6145562d6f28d0b41add2df5b40b8f5cb10cc649dd4 tfsec_1.26.0_linux_amd64.tar.gz" | sha256sum -c -
+                tar -xvzf tfsec_1.26.0_linux_amd64.tar.gz
+                sudo mv tfsec /usr/local/bin
+                tfsec -v
+                rm tfsec_1.26.0_linux_amd64.tar.gz
+
+          - task: Bash@3
             name: 'terraform_plan'
             displayName: 'Terraform Plan'
             env:
