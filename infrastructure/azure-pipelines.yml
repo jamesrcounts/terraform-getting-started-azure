@@ -54,9 +54,10 @@ stages:
                 tflint
 
           - task: Bash@3
-            displayName: 'Pin tfsec'
+            displayName: 'tfsec'
             inputs:
               targetType: 'inline'
+              workingDirectory: $(project_folder)
               script: |
                 set -euo pipefail
 
@@ -66,6 +67,8 @@ stages:
                 sudo mv tfsec /usr/local/bin
                 tfsec -v
                 rm tfsec_1.26.0_linux_amd64.tar.gz
+
+                tfsec
 
           - task: Bash@3
             name: 'terraform_plan'
