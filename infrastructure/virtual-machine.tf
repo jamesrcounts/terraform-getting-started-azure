@@ -1,8 +1,7 @@
 # Create a Linux virtual machine
 resource "azurerm_linux_virtual_machine" "vm" {
-  admin_password                  = random_password.admin_password.result
   admin_username                  = "plankton"
-  disable_password_authentication = false
+  disable_password_authentication = true
   location                        = data.azurerm_resource_group.rg.location
   name                            = "vm-${local.instance_id}"
   resource_group_name             = data.azurerm_resource_group.rg.name
@@ -30,14 +29,4 @@ resource "azurerm_linux_virtual_machine" "vm" {
     sku       = "16.04-LTS"
     version   = "latest"
   }
-}
-
-resource "random_password" "admin_password" {
-  length           = 16
-  min_lower        = 1
-  min_numeric      = 1
-  min_special      = 1
-  min_upper        = 1
-  override_special = "_%@"
-  special          = true
 }

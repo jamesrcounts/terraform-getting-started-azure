@@ -2,8 +2,8 @@
 	"name": "Terraform: Getting Started",
 	"build": {
 		"dockerfile": "Dockerfile",
-		"args": { 
-			"TERRAFORM_VERSION": "1.0.1",
+		"args": {
+			"TERRAFORM_VERSION": "1.1.7",
 			"TFLINT_VERSION": "0.28.0",
 			"INSTALL_AZURE_CLI": "true",
 			"INSTALL_DOCKER": "true",
@@ -13,7 +13,7 @@
 	"mounts": [ "source=/var/run/docker.sock,target=/var/run/docker-host.sock,type=bind" ],
 
 	// Set *default* container specific settings.json values on container create.
-	"settings": { 
+	"settings": {
 		"terminal.integrated.defaultProfile.linux": "zsh",
 		"terraform.languageServer": {
 			"enabled": true,
