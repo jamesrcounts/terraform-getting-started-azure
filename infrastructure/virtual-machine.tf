@@ -14,7 +14,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
   tags                            = data.azurerm_resource_group.rg.tags
 
   admin_ssh_key {
-    username   = "adminuser"
+    username   = "plankton"
     public_key = tls_private_key.key.public_key_openssh
   }
 
