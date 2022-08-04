@@ -1,3 +1,8 @@
+resource "tls_private_key" "key" {
+  algorithm = "RSA"
+  rsa_bits  = 2048
+}
+
 # Create a Linux virtual machine
 resource "azurerm_linux_virtual_machine" "vm" {
   admin_username                  = "plankton"
@@ -7,6 +12,11 @@ resource "azurerm_linux_virtual_machine" "vm" {
   resource_group_name             = data.azurerm_resource_group.rg.name
   size                            = "Standard_DS1_v2"
   tags                            = data.azurerm_resource_group.rg.tags
+
+  admin_ssh_key {
+    username   = "adminuser"
+    public_key = tls_private_key.key.public_key_openssh
+  }
 
   network_interface_ids = [
     azurerm_network_interface.nic.id,
