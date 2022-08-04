@@ -14,6 +14,20 @@ resource "azurerm_network_interface" "nic" {
   }
 }
 
+resource "azurerm_network_interface" "nic2" {
+  name                = "nic-${local.instance_id}-2"
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
+  tags                = data.azurerm_resource_group.rg.tags
+
+  ip_configuration {
+    name                          = "primary"
+    subnet_id                     = azurerm_subnet.subnet.id
+    private_ip_address_allocation = "Static"
+    private_ip_address            = cidrhost(azurerm_subnet.subnet.address_prefixes.0, 6)
+  }
+}
+
 # Create public IP
 resource "azurerm_public_ip" "publicip" {
   name                = "pip-${local.instance_id}"
