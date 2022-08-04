@@ -1,6 +1,6 @@
 # Create network interface
 resource "azurerm_network_interface" "nic" {
-  name                = "nic-${local.instance_id}"
+  name                = "nic-change-${local.instance_id}"
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
   tags                = data.azurerm_resource_group.rg.tags
